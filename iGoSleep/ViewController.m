@@ -16,6 +16,7 @@
 @property(nonatomic, strong) IBOutlet UILabel *ageValueLabel;
 @property (weak, nonatomic) IBOutlet UILabel *heightUnitLabel;
 @property (weak, nonatomic) IBOutlet UILabel *sexLabel;
+@property (weak, nonatomic) IBOutlet UILabel *weightValueLabel;
 
 @end
 
@@ -84,14 +85,14 @@
     
     switch (sex.biologicalSex) {
         case HKBiologicalSexFemale:
-            self.sexLabel.text = @"f";
+            self.sexLabel.text = [NSString stringWithFormat:@"性别：%@", @"f"];
             break;
             
         case HKBiologicalSexNotSet:
-            self.sexLabel.text = @"N";
+            self.sexLabel.text = [NSString stringWithFormat:@"性别：%@", @"noset"];
             break;
         case HKBiologicalSexMale:
-            self.sexLabel.text = @"M";
+            self.sexLabel.text = [NSString stringWithFormat:@"性别：%@", @"m"];
             break;
             
         default:
@@ -101,9 +102,53 @@
     
     
     
+    HKBloodTypeObject *blood = [self.healthStore bloodTypeWithError:&error];
+    NSLog(@"%d", blood.bloodType);
+    
+    
+    self.bloodValueLabel.text = [NSString stringWithFormat:@"血型：%d", blood.bloodType];
     
     [self updateUsersHeightLabel];
+    
+    
+    [self updateUsersWeightLabel];
 }
+
+- (void)updateUsersWeightLabel {
+    // Fetch the user's default weight unit in pounds.
+    NSMassFormatter *massFormatter = [[NSMassFormatter alloc] init];
+    massFormatter.unitStyle = NSFormattingUnitStyleLong;
+    
+    NSMassFormatterUnit weightFormatterUnit = NSMassFormatterUnitPound;
+    NSString *weightUnitString = [massFormatter unitStringFromValue:10 unit:weightFormatterUnit];
+    NSString *localizedWeightUnitDescriptionFormat = NSLocalizedString(@"Weight (%@)", nil);
+    
+    self.weightUnitLabel.text = [NSString stringWithFormat:localizedWeightUnitDescriptionFormat, weightUnitString];
+    
+    // Query to get the user's latest weight, if it exists.
+    HKQuantityType *weightType = [HKQuantityType quantityTypeForIdentifier:HKQuantityTypeIdentifierBodyMass];
+    
+    [self.healthStore aapl_mostRecentQuantitySampleOfType:weightType predicate:nil completion:^(HKQuantity *mostRecentQuantity, NSError *error) {
+        if (!mostRecentQuantity) {
+            NSLog(@"Either an error occured fetching the user's weight information or none has been stored yet. In your app, try to handle this gracefully.");
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self.weightValueLabel.text = NSLocalizedString(@"Not available", nil);
+            });
+        }
+        else {
+            // Determine the weight in the required unit.
+            HKUnit *weightUnit = [HKUnit poundUnit];
+            double usersWeight = [mostRecentQuantity doubleValueForUnit:weightUnit];
+            
+            // Update the user interface.
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self.weightValueLabel.text = [NSNumberFormatter localizedStringFromNumber:@(usersWeight) numberStyle:NSNumberFormatterNoStyle];
+            });
+        }
+    }];
+}
+
 
 
 - (void)loadView {    
@@ -155,12 +200,16 @@
 
 // Returns the types of data that Fit wishes to write to HealthKit.
 - (NSSet *)dataTypesToWrite {
+    
     HKQuantityType *dietaryCalorieEnergyType = [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierDietaryEnergyConsumed];
     HKQuantityType *activeEnergyBurnType = [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierActiveEnergyBurned];
     HKQuantityType *heightType = [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeight];
     HKQuantityType *weightType = [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierBodyMass];
+
+    HKCategoryType *sleep  = [HKCategoryType categoryTypeForIdentifier:HKCategoryTypeIdentifierSleepAnalysis];
     
-    return [NSSet setWithObjects:dietaryCalorieEnergyType, activeEnergyBurnType, heightType, weightType, nil];
+    
+    return [NSSet setWithObjects:dietaryCalorieEnergyType, activeEnergyBurnType, heightType, weightType, sleep,nil];
 }
 
 // Returns the types of data that Fit wishes to read from HealthKit.

@@ -40,14 +40,21 @@
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="H0m-t7-CVS">
+                                <rect key="frame" x="0.0" y="340" width="195" height="43"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
                     <connections>
                         <outlet property="ageValueLabel" destination="PhH-uh-44k" id="zzW-1R-hbu"/>
-                        <outlet property="heightUnitLabel" destination="lit-AP-fFH" id="VI7-9P-U1v"/>
+                        <outlet property="bloodValueLabel" destination="H0m-t7-CVS" id="Gir-Jk-kHB"/>
                         <outlet property="heightValueLabel" destination="c60-uC-mIz" id="xXe-e3-5YD"/>
                         <outlet property="sexLabel" destination="7Q1-Bg-UId" id="rLW-kg-GYF"/>
+                        <outlet property="weightUnitLabel" destination="lit-AP-fFH" id="wap-x0-d7p"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>

@@ -15,5 +15,7 @@
 @property (nonatomic) HKHealthStore *healthStore;
 @property (weak, nonatomic) IBOutlet UILabel *heightValueLabel;
 
+@property (weak, nonatomic) IBOutlet UILabel *weightUnitLabel;
+@property (weak, nonatomic) IBOutlet UILabel *bloodValueLabel;
 @end
 
